@@ -1,0 +1,8 @@
+Melance Gaudreault 4403946 Lab Assignment 3 - Virtual Memory
+
+To build: $ g++ -c main.cpp
+          $ g++ main.o -o main
+
+To run: $ ./main
+
+This program is a linked list dictionary. Work in progress.

@@ -20,12 +20,8 @@ typedef string WORD;
 
 
 /*
-
     structure describing a word entry in the dictionary
-
 */
-
-
 typedef struct entry {
 
       int count;                  /* frequency count for a particular word */
@@ -38,17 +34,8 @@ typedef struct entry {
 
 
 /*
-
     structure describing the dictionary
-
-*//*
-
-  adds word to dictionary , if word can't be added returns false else returns true
-
-
 */
-
-
 typedef  struct dict {
 
      int maxEntries;	  /* maximum number of entries allowed; this is an artificial limit */
@@ -67,15 +54,6 @@ typedef  struct dict {
 
 
 
-
-
-/*
-
-  you will have to write code for these 5 functions.
-
-*/
-
-
 ENTRY *LocateWord(DICT& , WORD);
 
 BOOL FullDictionary(DICT&);
@@ -87,43 +65,31 @@ WORD GetNextWord(void);
 void DumpDictionary(DICT&);
 
 
-/*
-  note that these are global variables so that they are already initialized to 0
-*/
-
 
 DICT dictionary={MAX,0,0};  // your dictionary                                                                */
 
 WORD word;
 
+int times = 1;
 
 /*
   adds word to dictionary , if word can't be added returns false else returns true
 */
-BOOL InsertWord(DICT &dict, WORD word)
+BOOL InsertWord( DICT &dict, WORD word)
 {
 
-entry *tmp = new entry;
-tmp->count = 1;
-tmp->w = word;
+    if (dict.maxEntries == dict.numWords) return false;
 
-if (dict.maxEntries != dict.numWords)
-	{
-	if (dict.numWords == 0)
-        {
-        dict.Words = tmp;
-        dict.numWords++;
-        return true;
-        }
-	else
-        {
-        dict.numWords++;
-        tmp->nextWord = dict.Words->nextWord;
-        dict.Words = tmp;
-        return true;
-        }
+    entry *tmp;
+
+
+    tmp->nextWord = dict.Words;
+
+    while (tmp->nextWord != NULL){
+        tmp = tmp->nextWord;
     }
-return false;
+    tmp->nextWord = tmp;
+    return true;
 }
 
 
@@ -132,11 +98,15 @@ return false;
 */
 void DumpDictionary(DICT &dict)
 {
-    entry ptr[dict.numWords];
+
+    entry *ptr;
+    ptr->nextWord = dict.Words;
     for (int i = 0; i < dict.numWords; i++)
         {
-        dict.Words -> nextWord[i] = ptr[i];
+        cout << ptr->w;
+        ptr = ptr->nextWord;
         }
+
 
 }
 
@@ -146,23 +116,27 @@ void DumpDictionary(DICT &dict)
 */
 WORD GetNextWord(void)
 {
+
+WORD w;
 char ch;
-int newLine= 0;
-WORD tmp;
+bool inword = false;
+
 while( cin.good() )
-	{
-    ch = cin.get();
-    if ( isalpha(ch) )  /* function test is ch  is A-Z, a-z */
-    	{
-    	ch = tolower(ch);
-    	tmp.push_back (ch); /* make room for ch in the WORD */
-        newLine = 1;
-        }
-    else
-    if (newLine) return tmp;
+{
+ ch = cin.get();
+ if ( isalpha(ch) )  /* function test if ch is A-Z, a-z */
+    {
+       w.push_back(ch);
+       inword= true;
     }
+ else if (inword) return w;
+}
+
+return w;
 
 }
+
+
 
 /*
    if dictionary is full, return true else false
@@ -178,16 +152,17 @@ else return false;
 */
 ENTRY *LocateWord(DICT &dict, WORD word)
 {
-    entry tmp;
-    tmp.nextWord = dict.Words;
+    //cout << "IN LOCATEWORD" << times++;
+    entry *tmp;
+    tmp->nextWord = dict.Words;
         for (int i = 0; i < dict.numWords; i++)
             {
-            if (tmp.nextWord -> w == word)
+            if (tmp->nextWord->w == word)
                 {
-                return tmp.nextWord;
+                return tmp->nextWord;
                 }
-            else tmp.nextWord = tmp.nextWord -> nextWord;
-                if (i = dict.numWords) return 0;
+            else tmp = tmp->nextWord;
+            if (i = dict.numWords) return 0;
             }
 
 }
@@ -195,8 +170,18 @@ ENTRY *LocateWord(DICT &dict, WORD word)
 
 int main (void)
 {
-    ENTRY *pos;
-int temp = 0;
+
+    ENTRY *pos = new ENTRY;
+
+/*
+    pos->count = 1;
+    pos->w = "hello";
+    dictionary.Words = pos;
+
+    DumpDictionary(dictionary);
+*/
+
+
     while (1)
     {
        word = GetNextWord();
@@ -207,15 +192,14 @@ int temp = 0;
             break;
         }
 
-        InsertWord(dictionary,word);
 
        if ((pos = LocateWord(dictionary,word)) >  0 ) pos->count++;
        else
-           if (!InsertWord(dictionary,word))
+           if (dictionary.numWords == dictionary.maxEntries)
 		   	{
 		   	cout << "dictionary full " << word <<  " cannot be added\n";
 		   	}
-
+            else (InsertWord(dictionary, word));
     }
 
     return 0;
